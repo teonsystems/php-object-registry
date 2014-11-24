@@ -29,7 +29,7 @@ class User {
 
 
 
-$ObjectRegistry = \Teon\ObjectRegistry\ObjectRegistry::factory();
+$ObjectRegistry = \Teon\ObjectRegistry\ObjectRegistry::getInstance();
 
 // Create two users, correct behaviour
 $User1_id1 = new User(1);

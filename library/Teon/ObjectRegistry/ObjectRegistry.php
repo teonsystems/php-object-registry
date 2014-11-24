@@ -37,11 +37,11 @@ class ObjectRegistry
 
 
     /*
-     * Factory fuse value to be used when factoring singleton object
+     * getInstance fuse value to be used when factoring singleton object
      *
      * @type   string
      */
-    protected static $_factoryFuseValue = 'calledFromFactoryMethod';
+    protected static $_getInstanceFuseValue = 'calledFromgetInstanceMethod';
 
 
 
@@ -62,12 +62,12 @@ class ObjectRegistry
      *
      * @return   Teon\ObjectRegistry\ObjecRegistry   Object registry instance
      */
-    public static function factory ()
+    public static function getInstance ()
     {
         static $instance = false;
 
         if (false === $instance) {
-            $instance = new self(self::$_factoryFuseValue);
+            $instance = new self(self::$_getInstanceFuseValue);
         }
 
         return $instance;
@@ -78,17 +78,17 @@ class ObjectRegistry
     /*
      * Constructor
      *
-     * Check if correct factory fuse value was provided, to prevent accidental
+     * Check if correct getInstance fuse value was provided, to prevent accidental
      * creation of multiple object instances of this class.
      *
-     * @param    string   Factory fuse value
+     * @param    string   getInstance fuse value
      * @return   void
      */
-    public function __construct ($factoryFuse='')
+    public function __construct ($getInstanceFuse='')
     {
         // Protect
-        if ($factoryFuse != self::$_factoryFuseValue) {
-            throw new \Exception(__CLASS__ ." is a singleton. Use ::factory() method to retrieve an instance");
+        if ($getInstanceFuse != self::$_getInstanceFuseValue) {
+            throw new \Exception(__CLASS__ ." is a singleton. Use ::getInstance() method to retrieve an instance");
         }
     }
 

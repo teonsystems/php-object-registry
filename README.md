@@ -4,30 +4,58 @@ PHP Object Registry
 Store, search and retrieve object instances at one place, to avoid having
 multiple entity instances in your application.
 
-Example:
 
 
-In file1.php:
+## Problem
+
+Problematic code:
+
+    class User {
+        public static function factory ($id) {
+            // Get from DB, by ID 1
+            return new self($id);
+        }
+    }
 
     function f1 ()
     {
-        $user1_id1 = new User(1);
-        echo $user1_id1->getName();   // Outputs "Roger", as that is what is stored in database
+        $User1 = User::factory(1);     // Instantiates user from database
+        echo $User1->getName();        // Outputs "Roger", as that is what is stored in database
 
         // Change it
         $user1_id1->setName('NewName');
-        # ...
-        # Call some function from file2.php, f2 for example
+        echo $User1->getName();        // Outputs "NewName", currect
+
+        // Call something else
+        f2();
     }
 
-
-
-In file2.php:
 
     function f2 ()
     {
-        $user2_id1 = new User(1);
-        echo $user2_id1->getName();
-        # outputs "Roger" instead of "NewName", because another user object was
-        # created from DB
+        $User1 = new User::factory(1);
+        echo $User1->getName();        // Outputs "Roger" instead of "NewName", incorrect
     }
+
+
+
+
+## Solution
+
+Ok code:
+
+    class User {
+        public static function factory ($id) {
+            $ObjectRegistry = \Teon\ObjectRegistry\ObjectRegistry::getInstance();
+            $User = $ObjectRegistry->find(self, $id);
+            if (false === $User) {
+                // Get from DB, by ID
+                return new self($id);
+            } else {
+                return $User;
+            }
+        }
+    }
+
+    // ...rest of the code is exactly the same, and functions correctly
+    // Third echo (in f2()) displays "NewName" as it should
