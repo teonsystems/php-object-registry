@@ -19,11 +19,11 @@ multiple entity instances in your application.
     function f1 ()
     {
         $User1 = User::factory(1);     // Instantiates user from database
-        echo $User1->getName();        // Outputs "Roger", as that is what is stored in database
+        echo $User1->getName();        // Outputs "Roger", correct (value from DB)
 
         // Change it
         $user1_id1->setName('NewName');
-        echo $User1->getName();        // Outputs "NewName", currect
+        echo $User1->getName();        // Outputs "NewName", correct
 
         // Call something else
         f2();
@@ -33,7 +33,7 @@ multiple entity instances in your application.
     function f2 ()
     {
         $User1 = new User::factory(1);
-        echo $User1->getName();        // Outputs "Roger" instead of "NewName", incorrect
+        echo $User1->getName();        // Outputs "Roger" instead of "NewName", INCORRECT
     }
 ```
 
