@@ -8,8 +8,7 @@ multiple entity instances in your application.
 
 ## Problem
 
-Problematic code:
-
+```php
     class User {
         public static function factory ($id) {
             // Get from DB, by ID 1
@@ -36,14 +35,13 @@ Problematic code:
         $User1 = new User::factory(1);
         echo $User1->getName();        // Outputs "Roger" instead of "NewName", incorrect
     }
-
+```
 
 
 
 ## Solution
 
-Ok code:
-
+```php
     class User {
         public static function factory ($id) {
             $ObjectRegistry = \Teon\ObjectRegistry\ObjectRegistry::getInstance();
@@ -59,3 +57,4 @@ Ok code:
 
     // ...rest of the code is exactly the same, and functions correctly
     // Third echo (in f2()) displays "NewName" as it should
+```
