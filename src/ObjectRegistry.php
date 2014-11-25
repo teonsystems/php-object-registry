@@ -21,28 +21,18 @@
 
 
 /*
- * This software is namespaced, to avoid class name collisions
+ * This software is namespaced
  */
 namespace Teon\ObjectRegistry;
 
 
 
 /*
- * CLASS: ObjectRegistry (singleton)
- *
- * Manages storing and retrieving already-created objects
+ * Class definition
  */
-class ObjectRegistry
+class     ObjectRegistry
+extends   \Teon\Base\Singleton\AbstractSingleton
 {
-
-
-
-    /*
-     * getInstance fuse value to be used when factoring singleton object
-     *
-     * @type   string
-     */
-    protected static $_getInstanceFuseValue = 'calledFromgetInstanceMethod';
 
 
 
@@ -55,43 +45,6 @@ class ObjectRegistry
      * @type   array
      */
     protected $_data = array();
-
-
-
-    /*
-     * Creates ObjectRegistry instance
-     *
-     * @return   Teon\ObjectRegistry\ObjecRegistry   Object registry instance
-     */
-    public static function getInstance ()
-    {
-        static $instance = false;
-
-        if (false === $instance) {
-            $instance = new self(self::$_getInstanceFuseValue);
-        }
-
-        return $instance;
-    }
-
-
-
-    /*
-     * Constructor
-     *
-     * Check if correct getInstance fuse value was provided, to prevent accidental
-     * creation of multiple object instances of this class.
-     *
-     * @param    string   getInstance fuse value
-     * @return   void
-     */
-    public function __construct ($getInstanceFuse='')
-    {
-        // Protect
-        if ($getInstanceFuse != self::$_getInstanceFuseValue) {
-            throw new \Exception(__CLASS__ ." is a singleton. Use ::getInstance() method to retrieve an instance");
-        }
-    }
 
 
 

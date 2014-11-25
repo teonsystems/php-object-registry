@@ -1,6 +1,7 @@
 <?php
 
 include __DIR__ . '/lib/Teon/Base/Loader.php';
+include __DIR__ . '/lib/Teon/Base/Singleton/AbstractSingleton.php';
 include __DIR__ . '/../autoload_register.php';
 
 
