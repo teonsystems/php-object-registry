@@ -1,6 +1,7 @@
 <?php
 
-include "../Autoload.php";
+include __DIR__ . '/lib/Teon/Base/Loader.php';
+include __DIR__ . '/../autoload_register.php';
 
 
 
@@ -58,7 +59,7 @@ echo "Object 1 clone name: ". $User1_clone->getName() ."\n";
 $ObjectRegistry->dump();
 
 // This one must return error, as it has the same ID as $User1, but is actually a different instance
-echo "\n\nINFO: THE FOLLOWING ERROR IS CORRECT BEHAVIOUR!\n\n";
+echo "\n\nINFO: THE FOLLOWING ERROR IS A RESULT OF EXPECTED BEHAVIOUR!\n\n";
 $User3_id1 = new User(1);
 $User3_id1->setName('Charlie');
 $ObjectRegistry->store($User3_id1);

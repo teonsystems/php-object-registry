@@ -58,3 +58,22 @@ multiple entity instances in your application.
     // ...rest of the code is exactly the same, and functions correctly
     // Third echo (in f2()) displays "NewName" as it should
 ```
+
+
+
+## Installation
+
+First clone the repository TO THE CORRECT LOCATION:
+```
+git clone https://github.com/teonsystems/php-object-registry ./vendor/Teon/ObjectRegistry
+```
+
+Then edit ./config/application.config.php
+```php
+return array(
+    'modules' => array(
+        'Application',
+        'Teon\Base',
+        'Teon\ObjectRegistry',
+    // ...
+```

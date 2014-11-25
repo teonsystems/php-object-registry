@@ -1,6 +1,7 @@
 <?php
 /*
  * PHP Object Registry
+ *
  * Copyright (C) 2012-2014 Teon d.o.o.
  *
  * This program is free software: you can redistribute it and/or modify
