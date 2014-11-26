@@ -61,10 +61,12 @@ multiple entity instances in your application.
 
 
 
-## Installation
+## Installation as Zend Framework 2 module
 
-First clone the repository TO THE CORRECT LOCATION:
+First clone the repositories TO THE CORRECT LOCATION:
 ```
+# Teon\Base is a prerequisite
+git clone https://github.com/teonsystems/php-base            ./vendor/Teon/Base
 git clone https://github.com/teonsystems/php-object-registry ./vendor/Teon/ObjectRegistry
 ```
 
@@ -73,7 +75,7 @@ Then edit ./config/application.config.php
 return array(
     'modules' => array(
         'Application',
-        'Teon\Base',
-        'Teon\ObjectRegistry',
+        'Teon\Base',             // Add this
+        'Teon\ObjectRegistry',   // Add this
     // ...
 ```
