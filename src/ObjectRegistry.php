@@ -37,14 +37,11 @@ extends   \Teon\Base\Singleton\AbstractSingleton
 
 
     /*
-     * Object storage data array
-     *
-     * This gets to be multidimensional array, like this:
-     *   $_data[$registrId][$objectId] = $object
+     * Scope storage
      *
      * @type   array
      */
-    protected $_data = array();
+    protected $scopeStorage = array();
 
 
 
@@ -65,44 +62,14 @@ extends   \Teon\Base\Singleton\AbstractSingleton
     ) {
         // Only objects are suppoted at this point
         if (!is_object($object)) {
-            throw new \Exception(__CLASS__ ." error: Only object storage is currently supported");
+            throw new Exception("Only object storage is currently supported");
         }
 
-        // Object ID is required
-        if (null === $objectId) {
-            if (!is_callable(array($object, 'getId'))) {
-                throw new \Exception(__CLASS__ ." error: No ID provided, and object of class ". get_class($object) ." does not provide getId() method");
-            }
-            $objectId = $object->getId();
-        }
-        $objectId = (string) $objectId;
+        // Get scope handler
+        $Scope = $this->_getScope($this->_determineScopeId($object, $scopeId));
 
-        // Get scope ID if not passed as argument
-        if (null === $scopeId) {
-            $scopeId = get_class($object);
-        } else {
-            if (!is_string($scopeId)) {
-                throw new \Exception(__CLASS__ ." error: Registry ID can only be string");
-            }
-        }
-
-        // Create scopeID array if it does not exist yet
-        if (!isset($this->_data[$scopeId])) {
-            $this->_data[$scopeId] = array();
-        }
-
-        // Store object if not yet in given scope
-        if (!isset($this->_data[$scopeId][$objectId])) {
-            $this->_data[$scopeId][$objectId] = $object;
-            return;
-        }
-
-        // Object with this key is already in scope - compare if the same, throw if not
-        if ($object !== $this->_data[$scopeId][$objectId]) {
-            throw new \Exception(__CLASS__ ." error: Registry '$scopeId' already contains this object ID instance ($objectId), but it is not the same instance as the one passed as argument to this method");
-        }
-
-        // Object is already stored, just return
+        // Store in the scope then
+        return $Scope->store($object, $objectId);
     }
 
 
@@ -110,37 +77,18 @@ extends   \Teon\Base\Singleton\AbstractSingleton
     /*
      * Find object by scope ID and object ID
      *
-     * Look for object in internal storage
+     * Look for object in given scope
      *
-     * @param    string|object   Registry ID: string or object whose class is used as scope ID
-     * @param    string          Key of the object that we are looking for
+     * @param    string|object   Scope ID: string or object whose class is used as scope ID
+     * @param    string          Key/ID of the object that we are looking for
      *
-     * @return   object|false    Return object if found, false if not
+     * @return   object|null     Return object if found, null if not
      */
-    public function find (
-        $scopeId,
-        $objectId
-    ) {
-        // If scope ID is passed as object of the same kind (for example User with different ID)
-        if (is_object($scopeId)) {
-            $scopeId = get_class($scopeId);
-        }
+    public function find ($scopeIdOrSameObject, $objectId)
+    {
+        $Scope = $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
 
-        // Object ID must be string
-        $objectId = (string) $objectId;
-
-        // Check if given scope exists
-        if (!isset($this->_data[$scopeId])) {
-            return false;
-        }
-
-        // Return object reference if exists?
-        if (isset($this->_data[$scopeId][$objectId])) {
-            return $this->_data[$scopeId][$objectId];
-        }
-
-        // Object not cached
-        return false;
+        return $Scope->find($objectId);
     }
 
 
@@ -148,21 +96,16 @@ extends   \Teon\Base\Singleton\AbstractSingleton
     /*
      * Get object by scope and object ID - throws error if not found
      *
-     * @param    string|object   Registry ID: string or object whose class is used as scope ID
-     * @param    string          Key of the object that we are looking for
+     * @param    string|object   Scope ID: string or object whose class is used as scope ID
+     * @param    string          Key/ID of the object that we are looking for
      *
-     * @return   object|false    Return object if found, false if not
+     * @return   object|null     Return object if found, null if not
      */
-    public function get (
-        $scopeId,
-        $objectId
-    ) {
-        $object = $this->find($scopeId, $objectId);
-        if ($object === false) {
-            throw new \Exception(__CLASS__ ." error: Object with id '$objectId' not found in scope '$scopeId'");
-        }
+    public function get ($scopeIdOrSameObject, $objectId)
+    {
+        $Scope = $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
 
-        return $object;
+        return $Scope->get($objectId);
     }
 
 
@@ -175,13 +118,12 @@ extends   \Teon\Base\Singleton\AbstractSingleton
      *
      * @return   boolean         Return true if exists, false if not
      */
-    public function exists (
-        $scopeId,
-        $objectId
-    ) {
-        $object = $this->find($scopeId, $objectId);
+    public function exists ($scopeIdOrSameObject, $objectId)
+    {
+        $Scope  = $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
 
-        if ($object === false) {
+        $Object = $Scope->find($objectId);
+        if (NULL === $Object) {
             return false;
         } else {
             return true;
@@ -203,7 +145,7 @@ extends   \Teon\Base\Singleton\AbstractSingleton
         $objectId=null,
         $scopeId=null
     ) {
-        throw new \Exception(__CLASS__ ." error: Object removal not yet implemented");
+        throw new Exception("Object removal not yet implemented");
     }
 
 
@@ -215,6 +157,65 @@ extends   \Teon\Base\Singleton\AbstractSingleton
      */
     public function dump ()
     {
-        print_r($this->_data);
+        print_r($this->scopeStorage);
+    }
+
+
+
+    /*
+     * Get scope subsystem
+     *
+     * @param    string|object   Scope ID or object to get scope for
+     * @return   Scope           Scope object
+     */
+    protected function getScope ($scopeIdOrSameObject)
+    {
+        return $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
+    }
+
+
+
+    /*
+     * Figure out proper scope ID
+     *
+     * @param    mixed    Object to operate on
+     * @param    string   Optional scope ID; if omitted, get_class($object) is used instead
+     * @return   string   Scope ID
+     */
+    protected function _determineScopeId ($object=null, $scopeId=null)
+    {
+        // Sanity check
+        if ((NULL === $object) && (NULL === $scopeId)) {
+            throw new Exception("Unable to determine requested scope");
+        }
+
+        // Get scope ID if not passed as argument
+        if (null === $scopeId) {
+            $scopeId = get_class($object);
+        } else {
+            if (!is_string($scopeId)) {
+                throw new Exception("Scope ID can only be string for now");
+            }
+        }
+
+        // Return it
+        return $scopeId;
+    }
+
+
+
+    /*
+     * Get scope subsystem
+     *
+     * @param    string   Scope ID to get Scope for
+     * @return   Scope    Scope object
+     */
+    protected function _getScope ($scopeId)
+    {
+        // Create Scope for this scope ID if it does not exist yet
+        if (!isset($this->scopeStorage[$scopeId])) {
+            $this->scopeStorage[$scopeId] = new Scope($scopeId);
+        }
+        return $this->scopeStorage[$scopeId];
     }
 }

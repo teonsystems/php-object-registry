@@ -24,7 +24,27 @@ class User {
     public function getName () {
         return $this->_name;
     }
-    public function SetName ($name) {
+    public function setName ($name) {
+        $this->_name = $name;
+    }
+}
+
+class Car {
+    protected $_id   = false;
+    protected $_name = '';
+
+    public function __construct ($id) {
+        $this->_id = $id;
+    }
+
+    public function getId () {
+        return $this->_id;
+    }
+
+    public function getName () {
+        return $this->_name;
+    }
+    public function setName ($name) {
         $this->_name = $name;
     }
 }
@@ -33,16 +53,31 @@ class User {
 
 $ObjectRegistry = \Teon\ObjectRegistry\ObjectRegistry::getInstance();
 
+
+
+// Create two cars, correct behaviour
+$Car1_id1 = new Car(1);
+$Car1_id1->setName('Tesla');
+$ObjectRegistry->store($Car1_id1);
+echo "Object Car 1 name: ". $Car1_id1->getName() ."\n";
+
+$Car2_id2 = new Car(2);
+$Car2_id2->setName('Tata');
+$ObjectRegistry->store($Car2_id2);
+echo "Object Car 2 name: ". $Car2_id2->getName() ."\n";
+
+
+
 // Create two users, correct behaviour
 $User1_id1 = new User(1);
 $User1_id1->setName('Alice');
 $ObjectRegistry->store($User1_id1);
-echo "Object 1 name: ". $User1_id1->getName() ."\n";
+echo "Object User 1 name: ". $User1_id1->getName() ."\n";
 
 $User2_id2 = new User(2);
 $User2_id2->setName('Bob');
 $ObjectRegistry->store($User2_id2);
-echo "Object 2 name: ". $User2_id2->getName() ."\n";
+echo "Object User 2 name: ". $User2_id2->getName() ."\n";
 
 // Find User with ID1, store in User11
 echo "Does user with ID 1 exists in the object registry?   ";
