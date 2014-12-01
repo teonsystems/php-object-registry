@@ -1,0 +1,25 @@
+{
+    "name": "teon/object-registry",
+    "type": "library",
+    "description": "Instantiated object registry, to be used as cache and prevention agains duplicate object/model instance creation",
+    "keywords": ["object", "registry", "object registry", "object cache"],
+    "homepage": "https://github.com/teonsystems/php-object-registry",
+    "license": "GPLv3",
+    "authors": [
+        {
+            "name": "Bostjan Skufca",
+            "email": "bostjan@a2o.si",
+            "homepage": "http://teon.si",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+        "teon/base": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Teon\\ObjectRegistry\\": "src"
+        }
+    }
+}
