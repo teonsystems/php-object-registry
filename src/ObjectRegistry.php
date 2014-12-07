@@ -120,7 +120,11 @@ extends   \Teon\Base\Singleton\AbstractSingleton
      */
     public function exists ($scopeIdOrSameObject, $objectId)
     {
-        $Scope  = $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
+        if (is_object($scopeIdOrSameObject)) {
+            $Scope = $this->_getScope($this->_determineScopeId($scopeIdOrSameObject));
+        } else {
+            $Scope = $this->_getScope($this->_determineScopeId(null, $scopeIdOrSameObject));
+        }
 
         $Object = $Scope->find($objectId);
         if (NULL === $Object) {
@@ -145,7 +149,8 @@ extends   \Teon\Base\Singleton\AbstractSingleton
         $objectId=null,
         $scopeId=null
     ) {
-        throw new Exception("Object removal not yet implemented");
+        $Scope  = $this->_getScope($this->_determineScopeId($object, $scopeId));
+        $Scope->remove($object, $objectId);
     }
 
 

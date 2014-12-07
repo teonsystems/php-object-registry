@@ -80,19 +80,7 @@ class     Scope
         $object,
         $objectId=null
     ) {
-        // Only objects are suppoted at this point
-        if (!is_object($object)) {
-            throw new Exception("Only object storage is currently supported");
-        }
-
-        // Object ID is required
-        if (null === $objectId) {
-            if (!is_callable(array($object, 'getId'))) {
-                throw new Exception("No ID provided, and object of class ". get_class($object) ." does not provide getId() method");
-            }
-            $objectId = $object->getId();
-        }
-        $objectId = (string) $objectId;
+        $objectId = $this->_determineObjectId($object, $objectId);
 
         // Store object if not yet stored
         if (!isset($this->objectStorage[$objectId])) {
@@ -184,7 +172,10 @@ class     Scope
      */
     public function remove ($object=null, $objectId=null)
     {
-        throw new Exception("Object removal not yet implemented");
+        $objectId = $this->_determineObjectId($object, $objectId);
+        if ($this->exists($objectId)) {
+            unset($this->objectStorage[$objectId]);
+        }
     }
 
 
@@ -197,6 +188,36 @@ class     Scope
     public function getScopeId ()
     {
         return $this->scopeId;
+    }
+
+
+
+    /*
+     * Determine object ID
+     *
+     * @param    mixed    Object to operate on
+     * @param    string   Optional object ID to use
+     * @return   int|string
+     */
+    protected function _determineObjectId (
+        $object,
+        $objectId=null
+    ) {
+        // Only objects are suppoted at this point
+        if (!is_object($object)) {
+            throw new Exception("Only object storage is currently supported");
+        }
+
+        // Object ID is required
+        if (null === $objectId) {
+            if (!is_callable(array($object, 'getId'))) {
+                throw new Exception("No ID provided, and object of class ". get_class($object) ." does not provide getId() method");
+            }
+            $objectId = $object->getId();
+        }
+        $objectId = (string) $objectId;
+
+        return $objectId;
     }
 
 
